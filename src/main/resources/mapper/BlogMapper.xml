@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间为对应的dao/mapper接口-->
+<mapper namespace="com.nick.blog.mapper.BlogMapper">
+    <insert id="addABlog" parameterType="com.nick.blog.dto.BlogDTO">
+        insert into blog (content,topic,title)
+        values
+        (#{content},#{topic},#{title})
+    </insert>
+    <update id="blogVisitCountIncrement">
+        update blog
+        set visit_count=visit_count+1
+        where id = #{id} and is_deleted = false;
+    </update>
+    <update id="updateABlog" parameterType="com.nick.blog.dto.BlogDTO">
+        update blog
+        set content=#{content},topic=#{topic},update_time=current_timestamp()
+        where id =#{id} and is_deleted = false;
+    </update>
+    <update id="deleteABlog">
+        update blog
+        set is_deleted = true
+        where id = #{id}
+    </update>
+    <update id="groupBlogVisitCountIncrement">
+        update blog
+        set visit_count = visit_count+1
+        where id in
+              (select id
+               from
+                   (select * from blog
+                    where is_deleted = false
+                    order by update_time desc
+                        limit #{pageNum},#{pageSize})
+                       as tt
+              )
+    </update>
+    <select id="getAllBlog" resultType="com.nick.blog.po.Blog">
+        select *
+        from blog
+        where is_deleted = false
+        order by update_time desc
+    </select>
+
+    <select id="getABlog" resultType="com.nick.blog.po.Blog">
+        select *
+        from blog
+        where is_deleted = false
+        and id = #{id}
+    </select>
+</mapper>

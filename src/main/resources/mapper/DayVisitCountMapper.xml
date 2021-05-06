@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间为对应的dao/mapper接口-->
+<mapper namespace="com.nick.blog.mapper.DayVisitCountMapper">
+
+    <insert id="CreateDayRecord" parameterType="com.nick.blog.po.DayVisitCount">
+        insert into day_visit_count
+        (date,visit_count_sum)
+        values
+        (#{date},#{visitCountSum})
+
+    </insert>
+    <update id="dayRecordIncrement">
+        update day_visit_count
+        set visit_count_sum = visit_count_sum + #{num}
+        where date = date_format(now(),'%Y-%m-%d')
+    </update>
+</mapper>

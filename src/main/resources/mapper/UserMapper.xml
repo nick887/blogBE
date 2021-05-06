@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间为对应的dao/mapper接口-->
+<mapper namespace="com.nick.blog.mapper.UserMapper">
+
+    <select id="userLogIn" resultType="com.nick.blog.po.User" parameterType="com.nick.blog.dto.UserDTO">
+        select *
+        from user
+        where account = #{account}
+        and password = #{password}
+    </select>
+</mapper>
