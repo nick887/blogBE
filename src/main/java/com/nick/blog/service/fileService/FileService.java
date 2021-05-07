@@ -5,15 +5,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * @author nick
@@ -26,13 +25,16 @@ import java.io.OutputStream;
 public class FileService {
     public int fileUpload(MultipartFile[] multipartFiles)
     {
-        String url = System.getProperty("user.dir")+"/src/main/resources/file";
+        String url=System.getProperty("user.home")+"/file";
         for (MultipartFile m :
                 multipartFiles) {
             try {
-                m.transferTo(new File(url,m.getOriginalFilename()));
+                System.out.println(m.getOriginalFilename());
+                File path = new File(url,m.getOriginalFilename());
+                m.transferTo(path);
             }catch (Exception e)
             {
+                e.printStackTrace();
                 return 0;
             }
         }
@@ -41,20 +43,27 @@ public class FileService {
 
     public int fileDownload(String filename, HttpServletResponse response)
     {
-        String url = System.getProperty("user.dir")+"/src/main/resources/file";
+        String url=System.getProperty("user.home")+"/file";
+        InputStream in=null;
         try {
-            File file=new File(url,filename);
-            if(!file.exists())
+            in=new FileInputStream(new File(url,filename));
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+
+        try {
+            if(in==null)
             {
-                throw new Exception();
+                throw new Exception("文件不存在");
             }
             response.reset();
             response.setContentType("application/octet-stream");
             response.setCharacterEncoding("utf-8");
-            response.setContentLength((int) file.length());
             response.setHeader("Content-Disposition", "attachment;filename=" + filename );
 
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+            BufferedInputStream bis = new BufferedInputStream(in);
             byte[] buff = new byte[1024];
             OutputStream os  = response.getOutputStream();
             int i = 0;
@@ -65,6 +74,7 @@ public class FileService {
             return 1;
         }catch (Exception e)
         {
+            e.printStackTrace();
             return 0;
         }
 

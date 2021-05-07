@@ -33,7 +33,7 @@ class BlogApplicationTests {
 
     @Test
     void abc(){
-
+        System.out.println(System.getProperty("user.home"));
     }
 
 }
